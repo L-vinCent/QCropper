@@ -14,5 +14,8 @@ public enum QCropper {
         public static var highlightColor = UIColor(red: 249 / 255.0, green: 214 / 255.0, blue: 74 / 255.0, alpha: 1)
 
         public static var resourceBundle = Bundle(for: CropperViewController.self)
+        
+        public static var imageEditorToolTitleNormalColor: UIColor = .qc.rgba(160, 160, 160)
+
     }
 }
