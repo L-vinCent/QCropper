@@ -144,6 +144,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     open lazy var bottomView: UIView = {
         let view = UIView(frame: CGRect(x: 0, y: self.view.height - 100, width: self.view.width, height: 100))
         view.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth]
+        view.backgroundColor = .black
         return view
     }()
 
@@ -159,13 +160,22 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     open lazy var toolbar: UIView = {
         let toolbar = Toolbar(frame: CGRect(x: 0, y: 0, width: self.view.width, height: view.safeAreaInsets.bottom + barHeight))
 //        toolbar.isHidden = true
-        toolbar.doneButton.addTarget(self, action: #selector(confirmButtonPressed(_:)), for: .touchUpInside)
-        toolbar.cancelButton.addTarget(self, action: #selector(cancelButtonPressed(_:)), for: .touchUpInside)
+        toolbar.doneBtn.addTarget(self, action: #selector(confirmButtonPressed(_:)), for: .touchUpInside)
+        toolbar.cancelBtn.addTarget(self, action: #selector(cancelButtonPressed(_:)), for: .touchUpInside)
         toolbar.resetButton.addTarget(self, action: #selector(resetButtonPressed(_:)), for: .touchUpInside)
-
+        toolbar.SegTapHandler = {[weak self] type in
+            self?.segTapHandle(type: type)
+        }
         return toolbar
     }()
 
+    
+    lazy var ratioCollectionView :CropRatioCollectionView = {
+        let view = CropRatioCollectionView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: CropRatioCollectionView.Ratioheight))
+        view.handSegmentTap(type: .clip)
+        return view
+    }()
+    
     let verticalAspectRatios: [AspectRatio] = [
         .original,
         .freeForm,
@@ -181,9 +191,10 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     open lazy var overlay: Overlay = Overlay(frame: self.view.bounds)
 
     public lazy var angleRuler: AngleRuler = {
-        let ar = AngleRuler(frame: CGRect(x: 0, y: 0, width: view.width, height: 80))
+        let ar = AngleRuler(frame: CGRect(x: 0, y: 0, width: view.width, height: 74))
         ar.addTarget(self, action: #selector(angleRulerValueChanged(_:)), for: .valueChanged)
         ar.addTarget(self, action: #selector(angleRulerTouchEnded(_:)), for: [.editingDidEnd])
+        ar.isHidden = true
         return ar
     }()
 
@@ -197,6 +208,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     @objc
     func angleRulerValueChanged(_: AnyObject) {
         toolbar.isUserInteractionEnabled = false
+        ratioCollectionView.isUserInteractionEnabled = false
         topBar.isUserInteractionEnabled = false
         scrollViewContainer.isUserInteractionEnabled = false
         setStraightenAngle(CGFloat(angleRuler.value * CGFloat.pi / 180.0))
@@ -210,6 +222,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         }, completion: { _ in
             self.toolbar.isUserInteractionEnabled = true
             self.topBar.isUserInteractionEnabled = true
+            self.ratioCollectionView.isUserInteractionEnabled = true
             self.scrollViewContainer.isUserInteractionEnabled = true
             self.overlay.gridLinesCount = 2
         })
@@ -252,6 +265,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         backgroundView.addSubview(scrollViewContainer)
         backgroundView.addSubview(overlay)
         bottomView.addSubview(aspectRatioPicker)
+        bottomView.addSubview(ratioCollectionView)
         bottomView.addSubview(angleRuler)
         bottomView.addSubview(toolbar)
 
@@ -303,6 +317,17 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
 
     // MARK: - User Interaction
 
+    func segTapHandle(type:XClipSegmentTap){
+        self.ratioCollectionView.handSegmentTap(type: type)
+        self.dealRuleShow(type: type)
+    }
+    
+    private func dealRuleShow(type:XClipSegmentTap){
+        let hidden = (type == .clip) ? true : false
+        self.angleRuler.isHidden = hidden
+        self.resetToDefaultLayout(onlyBottomFrameUpdate: true)
+    }
+    
     @objc
     func cropBoxPan(_ pan: UIPanGestureRecognizer) {
         guard isCropBoxPanEnabled else {
@@ -397,20 +422,25 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         }
     }
 
-    open func resetToDefaultLayout() {
-        let margin: CGFloat = 20
+    open func resetToDefaultLayout(onlyBottomFrameUpdate:Bool = false) {
+        let margin: CGFloat = 12
+        let ruleMargin: CGFloat = 5
 
+        let ruleHeight = angleRuler.isHidden ? 0.0 : ruleMargin + angleRuler.height
         topBar.frame = CGRect(x: 0, y: 0, width: view.width, height: view.safeAreaInsets.top + barHeight)
         toolbar.size = CGSize(width: view.width, height: view.safeAreaInsets.bottom + barHeight)
-        bottomView.size = CGSize(width: view.width, height: toolbar.height + angleRuler.height + margin)
+        bottomView.size = CGSize(width: view.width, height: toolbar.height +  ratioCollectionView.height + margin + ruleHeight)
         bottomView.bottom = view.height
         toolbar.bottom = bottomView.height
-        angleRuler.bottom = toolbar.top - margin
         aspectRatioPicker.frame = angleRuler.frame
-
+        ratioCollectionView.bottom = toolbar.top - margin
+        angleRuler.bottom = ratioCollectionView.top - ruleMargin
         let topHeight = topBar.isHidden ? view.safeAreaInsets.top : topBar.height
         let toolbarHeight = toolbar.isHidden ? view.safeAreaInsets.bottom : toolbar.height
-        let bottomHeight = (angleRuler.isHidden && aspectRatioPicker.isHidden) ? toolbarHeight : bottomView.height
+//        let bottomHeight = (angleRuler.isHidden && aspectRatioPicker.isHidden) ? toolbarHeight : bottomView.height
+        let bottomHeight = toolbar.height +  ratioCollectionView.height + margin + ruleMargin + angleRuler.height
+        
+        if(onlyBottomFrameUpdate){return}
         cropRegionInsets = UIEdgeInsets(top: cropContentInset.top + topHeight,
                                         left: cropContentInset.left + view.safeAreaInsets.left,
                                         bottom: cropContentInset.bottom + bottomHeight,
@@ -488,9 +518,9 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         if let toolbar = self.toolbar as? Toolbar {
             toolbar.resetButton.isHidden = isCurrentlyInDefalutState
             if initialState != nil {
-                toolbar.doneButton.isEnabled = !isCurrentlyInInitialState
+                toolbar.doneBtn.isEnabled = !isCurrentlyInInitialState
             } else {
-                toolbar.doneButton.isEnabled = true//!isCurrentlyInDefalutState
+                toolbar.doneBtn.isEnabled = true//!isCurrentlyInDefalutState
             }
         }
     }

@@ -1,14 +1,14 @@
 //
-//  AspectRatioCell.swift
+//  RatioCell.swift
 //  QCropper
 //
-//  Created by admin on 2024/10/24.
+//  Created by admin on 2024/10/25.
 //
 
 import Foundation
 import UIKit
 
-class AspectRatioCell: UICollectionViewCell {
+class RatioCell: UICollectionViewCell {
     private lazy var imageView: UIImageView = {
         let view = UIImageView(frame: CGRect(x: 6, y: 10, width: 38, height: 38))
         view.contentMode = .scaleAspectFill
@@ -20,7 +20,7 @@ class AspectRatioCell: UICollectionViewCell {
     
     lazy var titleLabel: UILabel = {
         let label = UILabel(frame: CGRect(x: 0, y: bounds.height - 20, width: bounds.width, height: 12))
-        label.font = UIFont.systemFont(ofSize: 10, weight: .regular)
+        label.font = .qc.font(ofSize: 10)
         label.textColor = .white
         label.textAlignment = .center
         label.layer.shadowColor = UIColor.black.withAlphaComponent(0.3).cgColor
@@ -31,13 +31,7 @@ class AspectRatioCell: UICollectionViewCell {
     
     var image: UIImage?
     
-//    var ratio: XCropProportionEnum!
-    
-    var selectIndex:Int = 0{
-        didSet{
-            
-        }
-    }
+    var selectIndex:Int = 0
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -78,7 +72,9 @@ class AspectRatioCell: UICollectionViewCell {
     }
     
     func configureCell(ratio: XCropProportionEnum,select:Bool) {
+//        imageView.image = image
         titleLabel.text = ratio.toName()
+
         if select {
             titleLabel.textColor = .white
             let imageName = "\("QCropper."+ratio.toImageName()+".high")"
@@ -88,7 +84,7 @@ class AspectRatioCell: UICollectionViewCell {
             let imageName = "\("QCropper."+ratio.toImageName()+".normal")"
             image = .qc.getImage(imageName)
         }
-            imageView.image = image
+        imageView.image = image
         setNeedsLayout()
     }
 }

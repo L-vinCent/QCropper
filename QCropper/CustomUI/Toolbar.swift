@@ -7,12 +7,8 @@
 import UIKit
 
 class Toolbar: UIView {
-    lazy var cancelButton: UIButton = {
-        let button = self.titleButton("Cancel")
-        button.left = 0
-        button.autoresizingMask = [.flexibleBottomMargin, .flexibleRightMargin]
-        return button
-    }()
+    
+    var SegTapHandler: ((XClipSegmentTap) -> Void)?
 
     lazy var resetButton: UIButton = {
         let button = self.titleButton("RESET", highlight: true)
@@ -23,13 +19,28 @@ class Toolbar: UIView {
         return button
     }()
 
-    lazy var doneButton: UIButton = {
-        let button = self.titleButton("Done", highlight: true)
-        button.right = self.width
-        button.setTitleColor(UIColor(white: 0.4, alpha: 1), for: .disabled)
-        button.autoresizingMask = [.flexibleBottomMargin, .flexibleLeftMargin]
-        return button
+    lazy var cancelBtn: EnlargeButton = {
+        let btn = EnlargeButton(type: .custom)
+        btn.setImage(.qc.getImage("QCropper.crop.close"), for: .normal)
+        btn.adjustsImageWhenHighlighted = false
+        btn.enlargeInset = 20
+        btn.left = 30
+        btn.autoresizingMask = [.flexibleBottomMargin, .flexibleRightMargin]
+
+        return btn
     }()
+    
+    lazy var doneBtn: EnlargeButton = {
+        let btn = EnlargeButton(type: .custom)
+        btn.setImage(.qc.getImage("QCropper.crop.sure"), for: .normal)
+        btn.adjustsImageWhenHighlighted = false
+        btn.enlargeInset = 20
+        btn.right = -30
+        btn.autoresizingMask = [.flexibleBottomMargin, .flexibleLeftMargin]
+
+        return btn
+    }()
+    
 
     lazy var blurBackgroundView: UIVisualEffectView = {
         let vev = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
@@ -41,19 +52,44 @@ class Toolbar: UIView {
         return vev
     }()
 
+    //底部segment 布局、滤镜
+    private lazy var segmentedControl: CropSegmentView = {
+        let titles = ["裁剪","旋转"]
+        let control = CropSegmentView(frame: .zero,titles: XClipSegmentTap.allCases) { [weak self] type in
+            self?.SegTapHandler?(type)
+        }
+        control.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth]
+
+        return control
+    }()
+
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
 
         addSubview(blurBackgroundView)
-        addSubview(cancelButton)
+        addSubview(cancelBtn)
         addSubview(resetButton)
-        addSubview(doneButton)
+        addSubview(doneBtn)
+        addSubview(segmentedControl)
+        layoutFrame(frame)
     }
 
+    
     required init?(coder _: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
+    
+    func layoutFrame(_ frame: CGRect){
+        segmentedControl.frame = CGRect(x: 0, y: 0, width: frame.size.width / 3, height: 44)
+        segmentedControl.bottom = frame.height // y 值根据需要设置
+        segmentedControl.centerX = frame.width / 2.0
+        cancelBtn.frame = CGRect(x: 30, y: 0, width: 25, height: 25)
+        doneBtn.frame = CGRect(x: frame.size.width - 30 - 25, y: 0, width: 25, height: 25)
+        cancelBtn.centerY = segmentedControl.centerY
+        doneBtn.centerY = segmentedControl.centerY
+    }
     func titleButton(_ title: String, highlight: Bool = false) -> UIButton {
         let font = UIFont.systemFont(ofSize: 17)
         let button = UIButton(frame: CGRect(center: .zero,

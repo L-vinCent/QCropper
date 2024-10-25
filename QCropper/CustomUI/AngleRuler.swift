@@ -49,7 +49,7 @@ public class AngleRuler: UIControl {
 
     private let lineName = "line"
     private let margin: CGFloat = 15
-    private let bottomMargin: CGFloat = 10
+    private let bottomMargin: CGFloat = 15
     private let borderWidth: CGFloat = 1.0 / UIScreen.main.scale
     // Make pixel alignment to avoid anti-aliasing, 0.5 = lineWidth / 2
     private lazy var pixelOffset = CGFloat(0.5.truncatingRemainder(dividingBy: Double(self.borderWidth)))
@@ -76,19 +76,26 @@ public class AngleRuler: UIControl {
     }()
 
     private lazy var midScaleLine: UIView = {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 30))
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 18))
         view.backgroundColor = .white
-        view.center = CGPoint(x: self.frame.size.width / 2.0 + pixelOffset, y: self.frame.size.height - bottomMargin - 15)
+        view.center = CGPoint(x: self.frame.size.width / 2.0 + pixelOffset, y: self.frame.size.height - bottomMargin - 9)
         return view
     }()
 
     private lazy var midScaleLineBorder: UIView = {
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: 1 + 2 * borderWidth, height: 30 + 2 * borderWidth))
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 1 + 2 * borderWidth, height: 18 + 2 * borderWidth))
         view.backgroundColor = UIColor(white: 0, alpha: 0.2)
         view.center = self.midScaleLine.center
         return view
     }()
-
+    
+    private lazy var triangleView: UIView = {
+        let view = TriangleView(frame: CGRect(x: 0, y: 0, width: 7, height: 7))
+        view.center = self.midScaleLine.center
+        view.bottom = scrollView.height
+        return view
+    }()
+    
     private lazy var zeroDot: UIView = {
         let x = (CGFloat(numberOfTotalScales) / 2) * scaleSpacing + pixelOffset + scrollViewContentInset - 3
         let view = UIView(frame: CGRect(x: x, y: frame.size.height - bottomMargin - 29, width: 6, height: 6))
@@ -126,7 +133,7 @@ public class AngleRuler: UIControl {
         }
 
         let grayScales = createShapeLayer()
-        grayScales.strokeColor = UIColor(white: 0.76, alpha: 1).cgColor
+        grayScales.strokeColor = UIColor.qc.rgba(102, 102, 102, 1.0).cgColor
         let grayPath = CGMutablePath()
 
         let whiteScales = createShapeLayer()
@@ -179,6 +186,7 @@ public class AngleRuler: UIControl {
         addSubview(midScaleLineBorder)
         addSubview(midScaleLine)
         addSubview(valueLabel)
+        addSubview(triangleView)
         layer.mask = maskLayer
 
         setValue(0, sendEvent: false)

@@ -32,6 +32,6 @@ extension UIImage {
 
 extension QCropWrapper where Base: UIImage {
     static func getImage(_ named: String) -> UIImage? {
-        return UIImage(named: named, in: QCropper.Config.resourceBundle, compatibleWith: nil)?.withRenderingMode(.alwaysTemplate)
+        return UIImage(named: named, in: QCropper.Config.resourceBundle, compatibleWith: nil)
     }
 }
