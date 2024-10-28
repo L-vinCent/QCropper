@@ -101,8 +101,11 @@ extension Rotatable where Self: CropperViewController {
             rect.origin.y = cropBoxCenter.y - rect.size.height / 2.0
 
             self.overlay.cropBoxFrame = rect
-
-            rotatingOverlay.transform = CGAffineTransform(rotationAngle: CGFloat.pi / 2.0).scaledBy(x: scale, y: scale)
+            if clockwise {
+                rotatingOverlay.transform = CGAffineTransform(rotationAngle: CGFloat.pi / 2.0).scaledBy(x: scale, y: scale)
+            } else {
+                rotatingOverlay.transform = CGAffineTransform(rotationAngle: -CGFloat.pi / 2.0).scaledBy(x: scale, y: scale)
+            }
             rotatingOverlay.center = scrollViewCenter
 
             let rotatedRect = rect.applying(CGAffineTransform(rotationAngle: self.totalAngle))

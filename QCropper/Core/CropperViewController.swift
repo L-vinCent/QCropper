@@ -154,6 +154,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         topBar.flipButton.addTarget(self, action: #selector(flipButtonPressed(_:)), for: .touchUpInside)
         topBar.rotateButton.addTarget(self, action: #selector(rotateButtonPressed(_:)), for: .touchUpInside)
         topBar.aspectRationButton.addTarget(self, action: #selector(aspectRationButtonPressed(_:)), for: .touchUpInside)
+//        topBar.isHidden = true
         return topBar
     }()
 
@@ -173,6 +174,12 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     lazy var ratioCollectionView :CropRatioCollectionView = {
         let view = CropRatioCollectionView(frame: CGRect(x: 0, y: 0, width: self.view.width, height: CropRatioCollectionView.Ratioheight))
         view.handSegmentTap(type: .clip)
+        view.ratioClick = {[weak self] ratio in
+            self?.aspectPressed(ratio: ratio)
+        }
+        view.rotateClick = {[weak self] type in
+            self?.rotatePressed(type: type)
+        }
         return view
     }()
     
@@ -403,6 +410,24 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         rotate90degrees()
     }
 
+    
+    func rotatePressed(type:XCropRotateEnum){
+        switch type{
+        case .cropHor:
+            flip()
+        case .cropVer:
+            flip(directionHorizontal: false)
+        case .cropLeft:
+            rotate90degrees(clockwise: false)
+        case .cropRight:
+            rotate90degrees()
+        }
+    }
+    
+    func aspectPressed(ratio:XCropProportionEnum){
+        setAspectRatio(ratio)
+    }
+    
     @objc
     func aspectRationButtonPressed(_ sender: UIButton) {
         sender.isSelected = !sender.isSelected
@@ -411,6 +436,8 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         aspectRatioPicker.isHidden = !sender.isSelected
     }
 
+    
+    
 // MARK: - Private Methods
 
     open var cropBoxFrame: CGRect {
@@ -766,7 +793,7 @@ extension CropperViewController: UIGestureRecognizerDelegate {
 extension CropperViewController: AspectRatioPickerDelegate {
 
     func aspectRatioPickerDidSelectedAspectRatio(_ aspectRatio: AspectRatio) {
-        setAspectRatio(aspectRatio)
+//        setAspectRatio(aspectRatio)
     }
 }
 

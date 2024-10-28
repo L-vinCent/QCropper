@@ -7,12 +7,12 @@
 import UIKit
 
 public protocol AspectRatioSettable {
-    func setAspectRatio(_ aspectRatio: AspectRatio)
+    func setAspectRatio(_ aspectRatio: XCropProportionEnum)
     func setAspectRatioValue(_ aspectRatioValue: CGFloat)
 }
 
 extension AspectRatioSettable where Self: CropperViewController {
-    public func setAspectRatio(_ aspectRatio: AspectRatio) {
+    public func setAspectRatio(_ aspectRatio: XCropProportionEnum) {
         switch aspectRatio {
         case .original:
             var width: CGFloat
@@ -40,24 +40,25 @@ extension AspectRatioSettable where Self: CropperViewController {
             }
             setAspectRatioValue(width / height)
             aspectRatioLocked = true
-        case .freeForm:
+        case .custom:
             aspectRatioPicker.selectedBox = .none
             aspectRatioLocked = false
-        case .square:
+        case .wh1x1:
             aspectRatioPicker.selectedBox = .none
             setAspectRatioValue(1)
             aspectRatioLocked = true
-        case let .ratio(width, height):
-            if width > height {
+        case .wh2x3, .wh3x2, .wh3x4, .wh4x3, .wh4x5, .wh5x4, .wh5x7, .wh7x5, .wh9x16, .wh16x9:
+            let ratio = aspectRatio.whRatio
+            if ratio > 0 {
                 aspectRatioPicker.selectedBox = .horizontal
-            } else if width < height {
+            } else if ratio < 0 {
                 aspectRatioPicker.selectedBox = .vertical
             } else {
                 aspectRatioPicker.selectedBox = .none
             }
-            setAspectRatioValue(CGFloat(width) / CGFloat(height))
-            aspectRatioLocked = true
-        }
+                setAspectRatioValue(ratio) // 使用 `whRatio` 属性来获取比例
+                aspectRatioLocked = true
+            }
     }
 
     public func setAspectRatioValue(_ aspectRatioValue: CGFloat) {

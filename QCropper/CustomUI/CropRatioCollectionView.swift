@@ -9,6 +9,8 @@ import Foundation
 
 class CropRatioCollectionView: UIView {
     
+    public var rotateClick:((XCropRotateEnum)->Void)? = nil
+    public var ratioClick:((XCropProportionEnum)->Void)? = nil
     static let Ratioheight = 70.0
     private var currentClipSegment:XClipSegmentTap = .clip{
         didSet{
@@ -117,6 +119,7 @@ extension CropRatioCollectionView: UICollectionViewDataSource, UICollectionViewD
             }
 //            UClick(param: ratio.UMClickName)
             selectedRatio = ratio
+            ratioClick?(ratio)
             clipRatioColView.reloadData()
             clipRatioColView.scrollToItem(at: indexPath, at: .centeredHorizontally, animated: true)
 //            calculateClipRect()
@@ -125,7 +128,7 @@ extension CropRatioCollectionView: UICollectionViewDataSource, UICollectionViewD
             
         }else{
             let rotate = clipRotates[indexPath.row]
-//            rotateClick(type: rotate)
+            rotateClick?(rotate)
         }
     }
 }
