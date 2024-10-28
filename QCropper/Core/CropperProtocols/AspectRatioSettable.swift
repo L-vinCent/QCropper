@@ -7,12 +7,12 @@
 import UIKit
 
 public protocol AspectRatioSettable {
-    func setAspectRatio(_ aspectRatio: XCropProportionEnum)
+    func setAspectRatio(_ aspectRatio: CropProportionEnum)
     func setAspectRatioValue(_ aspectRatioValue: CGFloat)
 }
 
 extension AspectRatioSettable where Self: CropperViewController {
-    public func setAspectRatio(_ aspectRatio: XCropProportionEnum) {
+    public func setAspectRatio(_ aspectRatio: CropProportionEnum) {
         switch aspectRatio {
         case .original:
             var width: CGFloat

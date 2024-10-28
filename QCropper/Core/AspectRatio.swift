@@ -88,11 +88,30 @@ import Foundation
 //    }
 //}
 
-public enum XCropProportionEnum: CaseIterable  {
+//友盟统计用的参数
+//public typealias FlipTuple = (horFlip: Bool, verFlip: Bool)
+public typealias UMRotateTuple = (horFlip: Bool, verFlip: Bool,right90:Bool,left90:Bool)
+
+public class UClipStatus {
+    public var angle: CGFloat = 0
+    public var ratio: CropProportionEnum
+    //是否进行了镜像
+    public var flipTuple:UMRotateTuple
+
+    public init(angle: CGFloat,ratio: CropProportionEnum,flip:UMRotateTuple = (false,false,false,false)) {
+        self.angle = angle
+        self.ratio = ratio
+        self.flipTuple = flip
+    }
+}
+
+
+
+public enum CropProportionEnum: CaseIterable  {
     case original(size: CGSize)
     case custom(size: CGSize)
     case wh1x1, wh3x4, wh4x3, wh9x16, wh16x9, wh2x3, wh3x2, wh4x5, wh5x4, wh5x7, wh7x5
-    public static var allCases: [XCropProportionEnum] {
+    public static var allCases: [CropProportionEnum] {
         return [
             .custom(size: .zero),
             .original(size:.zero),
@@ -236,7 +255,7 @@ public enum XCropProportionEnum: CaseIterable  {
     }
 
     
-    func updateSize(to newSize: CGSize) -> XCropProportionEnum {
+    func updateSize(to newSize: CGSize) -> CropProportionEnum {
           switch self {
           case .original:
               return .original(size: newSize)
@@ -249,8 +268,8 @@ public enum XCropProportionEnum: CaseIterable  {
     
 }
 
-extension XCropProportionEnum: Equatable {
-    public static func == (lhs: XCropProportionEnum, rhs: XCropProportionEnum) -> Bool {
+extension CropProportionEnum: Equatable {
+    public static func == (lhs: CropProportionEnum, rhs: CropProportionEnum) -> Bool {
         return lhs.toName() == rhs.toName()
     }
 }
@@ -270,10 +289,10 @@ public enum XClipSegmentTap:Int,CaseIterable  {
 }
 
 
-public enum XCropRotateEnum: CaseIterable  {
+public enum CropRotateEnum: CaseIterable  {
     case cropLeft, cropRight,cropHor,cropVer
     
-    public static var allCases: [XCropRotateEnum] {
+    public static var allCases: [CropRotateEnum] {
         return [
             .cropLeft,
             .cropRight,
@@ -336,4 +355,52 @@ public enum XCropRotateEnum: CaseIterable  {
     }
 
 }
-
+//
+//extension XCropProportionEnum: Codable {
+//    enum CodingKeys: String, CodingKey {
+//        case description
+//    }
+//
+//    public init(from decoder: Decoder) throws {
+//        let container = try decoder.container(keyedBy: CodingKeys.self)
+//        let description = try container.decode(String.self, forKey: .description)
+//        
+//        // 根据字符串初始化枚举
+//        switch description {
+//        case "origin":
+//            self = .original(size: .zero)
+//        case "free":
+//            self = .custom(size: .zero)
+//        case "1_1":
+//            self = .wh1x1
+//        case "3_4":
+//            self = .wh3x4
+//        case "4_3":
+//            self = .wh4x3
+//        case "9_16":
+//            self = .wh9x16
+//        case "16_9":
+//            self = .wh16x9
+//        case "2_3":
+//            self = .wh2x3
+//        case "3_2":
+//            self = .wh3x2
+//        case "4_5":
+//            self = .wh4x5
+//        case "5_4":
+//            self = .wh5x4
+//        case "5_7":
+//            self = .wh5x7
+//        case "7_5":
+//            self = .wh7x5
+//        default:
+//            throw DecodingError.dataCorruptedError(forKey: .description, in: container, debugDescription: "Invalid aspect ratio description")
+//        }
+//    }
+//
+//    public func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        // 使用 UMClickName 获取正确的字符串描述
+//        try container.encode(self.UMClickName, forKey: .description)
+//    }
+//}

@@ -38,6 +38,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         self.originalImage = originalImage
         self.initialState = initialState
         self.isCircular = isCircular
+        UselectedRatio = .custom(size: CGSize(width: originalImage.size.width, height: originalImage.size.height))
         super.init(nibName: nil, bundle: nil)
         modalPresentationStyle = .fullScreen
     }
@@ -87,6 +88,11 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     var stasisTimer: Timer?
     var stasisThings: (() -> Void)?
 
+    private var UClickRotate: UMRotateTuple = UMRotateTuple(false,false,false,false)
+    private var UselectedRatio: CropProportionEnum
+    public var UClipDoneBlock: ((UClipStatus,Bool) -> Void)?
+    public var isAfterDealPushEventExecuted = false
+    
     open var isCurrentlyInDefalutState: Bool {
         isCurrentlyInState(defaultCropperState)
     }
@@ -243,7 +249,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
 
     open override func viewDidLoad() {
         super.viewDidLoad()
-
+        UPageShow()
         navigationController?.navigationBar.isHidden = true
         view.clipsToBounds = true
 
@@ -372,13 +378,21 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     @objc
     func cancelButtonPressed(_: UIButton) {
         delegate?.cropperDidCancel(self)
+        URecord(success: false)
     }
 
     @objc
     func confirmButtonPressed(_: UIButton) {
         delegate?.cropperDidConfirm(self, state: saveState())
+        //友盟
     }
-
+  
+    private func URecord(success:Bool = true){
+        let angle = radiansToDegrees(totalAngle)
+        let status = UClipStatus(angle: angle, ratio: UselectedRatio,flip: UClickRotate)
+        UClipDoneBlock?(status,success)
+    }
+    
     @objc
     func resetButtonPressed(_: UIButton) {
         overlay.blur = false
@@ -411,20 +425,26 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     }
 
     
-    func rotatePressed(type:XCropRotateEnum){
+    func rotatePressed(type:CropRotateEnum){
+        UClick(param: type.UMClickName)
         switch type{
         case .cropHor:
             flip()
+            UClickRotate.horFlip = true
         case .cropVer:
             flip(directionHorizontal: false)
+            UClickRotate.verFlip = true
         case .cropLeft:
             rotate90degrees(clockwise: false)
+            UClickRotate.left90 = true
         case .cropRight:
             rotate90degrees()
+            UClickRotate.right90 = true
         }
     }
     
-    func aspectPressed(ratio:XCropProportionEnum){
+    func aspectPressed(ratio:CropProportionEnum){
+        UselectedRatio = ratio
         setAspectRatio(ratio)
     }
     
@@ -440,6 +460,11 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     
 // MARK: - Private Methods
 
+    private func radiansToDegrees(_ radians: CGFloat) -> CGFloat {
+        return radians * 180 / .pi
+    }
+    
+    
     open var cropBoxFrame: CGRect {
         get {
             return overlay.cropBoxFrame
@@ -785,6 +810,35 @@ extension CropperViewController: UIGestureRecognizerDelegate {
         }
 
         return true
+    }
+}
+
+// 定义通知名称
+public extension Notification.Name {
+ 
+    public static let trackClipShowNotification = Notification.Name("trackClipShowNotification")
+    //裁剪功能使用
+    public static let trackClipClickNotification = Notification.Name("trackClipClickNotification")
+   
+}
+
+extension CropperViewController {
+   private func UPageShow(){
+       CropperViewController.notifyClipPageShow(paramString: isAfterDealPushEventExecuted ? "homepage" : "homepage_editor_page" )
+    }
+    
+   private func UClick(param:String){
+       CropperViewController.notifyClipClick(paramString: param )
+    }
+    
+    static func notifyClipPageShow(paramString:String) {
+        // 发送通知，包含事件名称和参数
+        NotificationCenter.default.post(name: .trackClipShowNotification, object: nil, userInfo:["key":paramString])
+    }
+    
+    static func notifyClipClick(paramString:String) {
+        // 发送通知，包含事件名称和参数
+        NotificationCenter.default.post(name: .trackClipClickNotification, object: nil, userInfo:["key":paramString])
     }
 }
 

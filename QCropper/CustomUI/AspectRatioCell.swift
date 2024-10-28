@@ -67,7 +67,7 @@ class AspectRatioCell: UICollectionViewCell {
         contentView.addSubview(titleLabel)
     }
     
-    func configureRotateCell(rotate: XCropRotateEnum) {
+    func configureRotateCell(rotate: CropRotateEnum) {
         
         titleLabel.text = rotate.toName()
         titleLabel.textColor = .white
@@ -77,7 +77,7 @@ class AspectRatioCell: UICollectionViewCell {
         setNeedsLayout()
     }
     
-    func configureCell(ratio: XCropProportionEnum,select:Bool) {
+    func configureCell(ratio: CropProportionEnum,select:Bool) {
         titleLabel.text = ratio.toName()
         if select {
             titleLabel.textColor = .white

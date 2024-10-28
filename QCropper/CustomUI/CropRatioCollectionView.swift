@@ -9,8 +9,8 @@ import Foundation
 
 class CropRatioCollectionView: UIView {
     
-    public var rotateClick:((XCropRotateEnum)->Void)? = nil
-    public var ratioClick:((XCropProportionEnum)->Void)? = nil
+    public var rotateClick:((CropRotateEnum)->Void)? = nil
+    public var ratioClick:((CropProportionEnum)->Void)? = nil
     static let Ratioheight = 70.0
     private var currentClipSegment:XClipSegmentTap = .clip{
         didSet{
@@ -19,9 +19,9 @@ class CropRatioCollectionView: UIView {
             rotateColView.isHidden = isClip
         }
     }
-    var clipRatios :[XCropProportionEnum] = XCropProportionEnum.allCases
-    private var clipRotates :[XCropRotateEnum] = XCropRotateEnum.allCases
-    private var selectedRatio: XCropProportionEnum = .custom(size: .zero)
+    var clipRatios :[CropProportionEnum] = CropProportionEnum.allCases
+    private var clipRotates :[CropRotateEnum] = CropRotateEnum.allCases
+    private var selectedRatio: CropProportionEnum = .custom(size: .zero)
 
     private lazy var clipRatioColView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
