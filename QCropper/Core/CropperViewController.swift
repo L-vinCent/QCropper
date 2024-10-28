@@ -93,6 +93,18 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     public var UClipDoneBlock: ((UClipStatus,Bool) -> Void)?
     public var isAfterDealPushEventExecuted = false
     
+    /// 用作进入裁剪界面首次动画frame
+    public var presentAnimateFrame: CGRect?
+    /// 用作进入裁剪界面首次动画和取消裁剪时动画的image
+    public var presentAnimateImage: UIImage?
+    
+    public var dismissAnimateFromRect: CGRect = .zero
+    
+    public var dismissAnimateImage: UIImage?
+    
+    public var animateImageView: UIImageView?
+    
+    
     open var isCurrentlyInDefalutState: Bool {
         isCurrentlyInState(defaultCropperState)
     }
@@ -160,7 +172,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         topBar.flipButton.addTarget(self, action: #selector(flipButtonPressed(_:)), for: .touchUpInside)
         topBar.rotateButton.addTarget(self, action: #selector(rotateButtonPressed(_:)), for: .touchUpInside)
         topBar.aspectRationButton.addTarget(self, action: #selector(aspectRationButtonPressed(_:)), for: .touchUpInside)
-//        topBar.isHidden = true
+        topBar.isHidden = true
         return topBar
     }()
 
@@ -285,6 +297,20 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         view.addSubview(backgroundView)
         view.addSubview(bottomView)
         view.addSubview(topBar)
+        
+        animationImage()
+    }
+    
+   private func animationImage(){
+        if let presentAnimateFrame = presentAnimateFrame,
+           let presentAnimateImage = presentAnimateImage {
+            let animateImageView = UIImageView(image: presentAnimateImage)
+            animateImageView.contentMode = .scaleAspectFill
+            animateImageView.clipsToBounds = true
+            animateImageView.frame = presentAnimateFrame
+            self.animateImageView = animateImageView
+            view.addSubview(self.animateImageView!)
+        }
     }
 
     open override func viewDidLayoutSubviews() {
@@ -309,6 +335,35 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         }
     }
 
+    open override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let navigationController = presentingViewController as? UINavigationController,
+           let presentingVC = navigationController.topViewController as? CropImageDismissTransitionHandler {
+            transitioningDelegate = self
+        } else if let presentingVC = presentingViewController as? CropImageDismissTransitionHandler {
+            transitioningDelegate = self
+        }
+        let rect = self.overlay.cropBoxFrame
+        if let presentAnimateFrame = presentAnimateFrame,
+           let presentAnimateImage = presentAnimateImage,
+           let animateImageView = animateImageView {
+           self.backgroundView.alpha = 0.0
+           self.bottomView.alpha = 0.0
+
+//            self.shadowView.isHiddenBlurView = true
+            UIView.animate(withDuration: 0.25, animations: {[weak self] in
+                self?.bottomView.alpha = 1.0
+                animateImageView.frame = rect
+            }) {[weak self] _ in
+                self?.backgroundView.alpha = 1.0
+                animateImageView.removeFromSuperview()
+
+            }
+        } else {
+            backgroundView.alpha = 1.0
+            bottomView.alpha = 1.0
+        }
+    }
     open override var prefersStatusBarHidden: Bool {
         return true
     }
@@ -377,13 +432,16 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
 
     @objc
     func cancelButtonPressed(_: UIButton) {
+        self.dismissAnimateFromRect = overlay.cropBoxFrame
         delegate?.cropperDidCancel(self)
         URecord(success: false)
     }
 
     @objc
     func confirmButtonPressed(_: UIButton) {
-        delegate?.cropperDidConfirm(self, state: saveState())
+        self.dismissAnimateFromRect = overlay.cropBoxFrame
+        let state = saveState()
+        delegate?.cropperDidConfirm(self, state: state)
         //友盟
     }
   
@@ -854,3 +912,12 @@ extension CropperViewController {
 // MARK: Add capability from protocols
 
 extension CropperViewController: Stasisable, AngleAssist, CropBoxEdgeDraggable, AspectRatioSettable {}
+
+//MARK: 控制器转场 UIViewControllerTransitioningDelegate
+
+extension CropperViewController: UIViewControllerTransitioningDelegate {
+    public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+            return CropImageDismissAnimatedTransition()
+    }
+}
+
