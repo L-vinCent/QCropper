@@ -125,7 +125,7 @@ extension Rotatable where Self: CropperViewController {
             self.scrollView.contentOffset = self.safeContentOffsetForScrollView(newContentOffset)
             self.scrollView.center = scrollViewCenter
         }, completion: { _ in
-            self.aspectRatioPicker.rotateAspectRatios()
+//            self.aspectRatioPicker.rotateAspectRatios()
             self.overlay.cropBoxAlpha = 0
             self.overlay.blur = true
             self.overlay.isHidden = false

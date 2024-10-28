@@ -183,17 +183,17 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         return view
     }()
     
-    let verticalAspectRatios: [AspectRatio] = [
-        .original,
-        .freeForm,
-        .square,
-        .ratio(width: 9, height: 16),
-        .ratio(width: 8, height: 10),
-        .ratio(width: 5, height: 7),
-        .ratio(width: 3, height: 4),
-        .ratio(width: 3, height: 5),
-        .ratio(width: 2, height: 3)
-    ]
+//    let verticalAspectRatios: [AspectRatio] = [
+//        .original,
+//        .freeForm,
+//        .square,
+//        .ratio(width: 9, height: 16),
+//        .ratio(width: 8, height: 10),
+//        .ratio(width: 5, height: 7),
+//        .ratio(width: 3, height: 4),
+//        .ratio(width: 3, height: 5),
+//        .ratio(width: 2, height: 3)
+//    ]
 
     open lazy var overlay: Overlay = Overlay(frame: self.view.bounds)
 
@@ -205,12 +205,12 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         return ar
     }()
 
-    public lazy var aspectRatioPicker: AspectRatioPicker = {
-        let picker = AspectRatioPicker(frame: CGRect(x: 0, y: 0, width: view.width, height: 80))
-        picker.isHidden = true
-        picker.delegate = self
-        return picker
-    }()
+//    public lazy var aspectRatioPicker: AspectRatioPicker = {
+//        let picker = AspectRatioPicker(frame: CGRect(x: 0, y: 0, width: view.width, height: 80))
+//        picker.isHidden = true
+//        picker.delegate = self
+//        return picker
+//    }()
 
     @objc
     func angleRulerValueChanged(_: AnyObject) {
@@ -271,7 +271,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
 
         backgroundView.addSubview(scrollViewContainer)
         backgroundView.addSubview(overlay)
-        bottomView.addSubview(aspectRatioPicker)
+//        bottomView.addSubview(aspectRatioPicker)
         bottomView.addSubview(ratioCollectionView)
         bottomView.addSubview(angleRuler)
         bottomView.addSubview(toolbar)
@@ -433,7 +433,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         sender.isSelected = !sender.isSelected
 
         angleRuler.isHidden = sender.isSelected
-        aspectRatioPicker.isHidden = !sender.isSelected
+//        aspectRatioPicker.isHidden = !sender.isSelected
     }
 
     
@@ -459,7 +459,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         bottomView.size = CGSize(width: view.width, height: toolbar.height +  ratioCollectionView.height + margin + ruleHeight)
         bottomView.bottom = view.height
         toolbar.bottom = bottomView.height
-        aspectRatioPicker.frame = angleRuler.frame
+//        aspectRatioPicker.frame = angleRuler.frame
         ratioCollectionView.bottom = toolbar.top - margin
         angleRuler.bottom = ratioCollectionView.top - ruleMargin
         let topHeight = topBar.isHidden ? view.safeAreaInsets.top : topBar.height
@@ -514,7 +514,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
             isCropBoxPanEnabled = false
             overlay.isCircular = true
             topBar.isHidden = true
-            aspectRatioPicker.isHidden = true
+//            aspectRatioPicker.isHidden = true
             angleRuler.isHidden = true
             cropBoxFrame = CGRect(center: defaultCropBoxCenter, size: CGSize(width: maxCropRegion.size.width, height: maxCropRegion.size.width))
             matchScrollViewAndCropView()
@@ -531,13 +531,13 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         defaultCropperState = saveState()
 
         angleRuler.value = 0
-        if overlay.cropBoxFrame.size.width > overlay.cropBoxFrame.size.height {
-            aspectRatioPicker.aspectRatios = verticalAspectRatios.map { $0.rotated }
-        } else {
-            aspectRatioPicker.aspectRatios = verticalAspectRatios
-        }
-        aspectRatioPicker.rotated = false
-        aspectRatioPicker.selectedAspectRatio = .freeForm
+//        if overlay.cropBoxFrame.size.width > overlay.cropBoxFrame.size.height {
+//            aspectRatioPicker.aspectRatios = verticalAspectRatios.map { $0.rotated }
+//        } else {
+//            aspectRatioPicker.aspectRatios = verticalAspectRatios
+//        }
+//        aspectRatioPicker.rotated = false
+//        aspectRatioPicker.selectedAspectRatio = .freeForm
         updateButtons()
     }
 
@@ -790,12 +790,12 @@ extension CropperViewController: UIGestureRecognizerDelegate {
 
 // MARK: AspectRatioPickerDelegate
 
-extension CropperViewController: AspectRatioPickerDelegate {
-
-    func aspectRatioPickerDidSelectedAspectRatio(_ aspectRatio: AspectRatio) {
-//        setAspectRatio(aspectRatio)
-    }
-}
+//extension CropperViewController: AspectRatioPickerDelegate {
+//
+//    func aspectRatioPickerDidSelectedAspectRatio(_ aspectRatio: AspectRatio) {
+////        setAspectRatio(aspectRatio)
+//    }
+//}
 
 // MARK: Add capability from protocols
 

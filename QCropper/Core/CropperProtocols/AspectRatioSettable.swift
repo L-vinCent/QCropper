@@ -27,35 +27,35 @@ extension AspectRatioSettable where Self: CropperViewController {
                 height = originalImage.size.height
             }
 
-            if aspectRatioPicker.rotated {
-                swap(&width, &height)
-            }
-
-            if width > height {
-                aspectRatioPicker.selectedBox = .horizontal
-            } else if width < height {
-                aspectRatioPicker.selectedBox = .vertical
-            } else {
-                aspectRatioPicker.selectedBox = .none
-            }
+//            if aspectRatioPicker.rotated {
+//                swap(&width, &height)
+//            }
+//
+//            if width > height {
+//                aspectRatioPicker.selectedBox = .horizontal
+//            } else if width < height {
+//                aspectRatioPicker.selectedBox = .vertical
+//            } else {
+//                aspectRatioPicker.selectedBox = .none
+//            }
             setAspectRatioValue(width / height)
             aspectRatioLocked = true
         case .custom:
-            aspectRatioPicker.selectedBox = .none
+//            aspectRatioPicker.selectedBox = .none
             aspectRatioLocked = false
         case .wh1x1:
-            aspectRatioPicker.selectedBox = .none
+//            aspectRatioPicker.selectedBox = .none
             setAspectRatioValue(1)
             aspectRatioLocked = true
         case .wh2x3, .wh3x2, .wh3x4, .wh4x3, .wh4x5, .wh5x4, .wh5x7, .wh7x5, .wh9x16, .wh16x9:
             let ratio = aspectRatio.whRatio
-            if ratio > 0 {
-                aspectRatioPicker.selectedBox = .horizontal
-            } else if ratio < 0 {
-                aspectRatioPicker.selectedBox = .vertical
-            } else {
-                aspectRatioPicker.selectedBox = .none
-            }
+//            if ratio > 0 {
+//                aspectRatioPicker.selectedBox = .horizontal
+//            } else if ratio < 0 {
+//                aspectRatioPicker.selectedBox = .vertical
+//            } else {
+//                aspectRatioPicker.selectedBox = .none
+//            }
                 setAspectRatioValue(ratio) // 使用 `whRatio` 属性来获取比例
                 aspectRatioLocked = true
             }
