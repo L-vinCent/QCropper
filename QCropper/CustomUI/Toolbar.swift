@@ -10,14 +10,15 @@ class Toolbar: UIView {
     
     var SegTapHandler: ((XClipSegmentTap) -> Void)?
 
-    lazy var resetButton: UIButton = {
-        let button = self.titleButton("RESET", highlight: true)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-        button.isHidden = true
-        button.centerX = self.width / 2
-        button.autoresizingMask = [.flexibleBottomMargin, .flexibleRightMargin]
-        return button
-    }()
+//    lazy var resetButton: UIButton = {
+//        let button = self.titleButton("还原", highlight: true)
+//        button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+//        button.isHidden = true
+//        button.centerX = self.width / 2
+//        button.backgroundColor = .qc.rgba(71, 69, 83, 1)
+//        button.autoresizingMask = [.flexibleBottomMargin, .flexibleRightMargin]
+//        return button
+//    }()
 
     lazy var cancelBtn: EnlargeButton = {
         let btn = EnlargeButton(type: .custom)
@@ -69,7 +70,7 @@ class Toolbar: UIView {
 
         addSubview(blurBackgroundView)
         addSubview(cancelBtn)
-        addSubview(resetButton)
+//        addSubview(resetButton)
         addSubview(doneBtn)
         addSubview(segmentedControl)
         layoutFrame(frame)
@@ -89,23 +90,5 @@ class Toolbar: UIView {
         doneBtn.frame = CGRect(x: frame.size.width - 30 - 25, y: 0, width: 25, height: 25)
         cancelBtn.centerY = segmentedControl.centerY
         doneBtn.centerY = segmentedControl.centerY
-    }
-    func titleButton(_ title: String, highlight: Bool = false) -> UIButton {
-        let font = UIFont.systemFont(ofSize: 17)
-        let button = UIButton(frame: CGRect(center: .zero,
-                                            size: CGSize(width: title.width(withFont: font) + 20, height: 44)))
-        if highlight {
-            button.setTitleColor(QCropper.Config.highlightColor, for: .normal)
-            button.setTitleColor(QCropper.Config.highlightColor.withAlphaComponent(0.7), for: .highlighted)
-        } else {
-            button.setTitleColor(UIColor(white: 1, alpha: 1.0), for: .normal)
-            button.setTitleColor(UIColor(white: 1, alpha: 0.7), for: .highlighted)
-        }
-        button.titleLabel?.font = font
-        button.setTitle(title, for: .normal)
-        button.top = 0
-
-        button.autoresizingMask = [.flexibleRightMargin, .flexibleWidth]
-        return button
     }
 }

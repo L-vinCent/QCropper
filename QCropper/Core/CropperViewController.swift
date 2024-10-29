@@ -104,6 +104,19 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     
     public var animateImageView: UIImageView?
     
+    private lazy var resetButton: UIButton = {
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 44, height: 23))
+        button.setTitle("还原", for: .normal)
+        button.setTitleColor(.qc.rgba(212, 212, 212), for: .normal)
+        button.addTarget(self, action: #selector(resetButtonPressed(_:)), for: .touchUpInside)
+        button.titleLabel?.font = .qc.PingFangMedium(size: 12)
+        button.isHidden = true
+        button.backgroundColor = .qc.rgba(71, 69, 83, 1)
+        button.layer.masksToBounds = true
+        button.layer.cornerRadius = 5.0
+        button.autoresizingMask = [.flexibleBottomMargin, .flexibleRightMargin]
+        return button
+    }()
     
     open var isCurrentlyInDefalutState: Bool {
         isCurrentlyInState(defaultCropperState)
@@ -181,7 +194,6 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
 //        toolbar.isHidden = true
         toolbar.doneBtn.addTarget(self, action: #selector(confirmButtonPressed(_:)), for: .touchUpInside)
         toolbar.cancelBtn.addTarget(self, action: #selector(cancelButtonPressed(_:)), for: .touchUpInside)
-        toolbar.resetButton.addTarget(self, action: #selector(resetButtonPressed(_:)), for: .touchUpInside)
         toolbar.SegTapHandler = {[weak self] type in
             self?.segTapHandle(type: type)
         }
@@ -236,6 +248,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         ratioCollectionView.isUserInteractionEnabled = false
         topBar.isUserInteractionEnabled = false
         scrollViewContainer.isUserInteractionEnabled = false
+        resetButton.isHidden = true
         setStraightenAngle(CGFloat(angleRuler.value * CGFloat.pi / 180.0))
     }
 
@@ -250,6 +263,8 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
             self.ratioCollectionView.isUserInteractionEnabled = true
             self.scrollViewContainer.isUserInteractionEnabled = true
             self.overlay.gridLinesCount = 2
+            self.resetButton.isHidden = self.isCurrentlyInDefalutState
+
         })
     }
 
@@ -297,7 +312,8 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         view.addSubview(backgroundView)
         view.addSubview(bottomView)
         view.addSubview(topBar)
-        
+        view.addSubview(resetButton)
+
         animationImage()
     }
     
@@ -383,6 +399,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         super.viewWillTransition(to: size, with: coordinator)
     }
 
+   
     // MARK: - User Interaction
 
     func segTapHandle(type:XClipSegmentTap){
@@ -412,6 +429,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
             overlay.gridLinesAlpha = 1
             topBar.isUserInteractionEnabled = false
             bottomView.isUserInteractionEnabled = false
+            resetButton.isHidden = true
         }
 
         if pan.state == .ended || pan.state == .cancelled {
@@ -587,6 +605,10 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         overlay.frame = backgroundView.bounds
         overlay.cropBoxFrame = CGRect(center: defaultCropBoxCenter, size: defaultCropBoxSize)
 
+        resetButton.centerX = view.width / 2.0
+        let cropBoxBottomY = overlay.cropBoxFrame.maxY
+        resetButton.bottom = cropBoxBottomY - 20
+        
         straightenAngle = 0
         rotationAngle = 0
         flipAngle = 0
@@ -624,9 +646,29 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         updateButtons()
     }
 
+    private func titleButton(_ title: String, highlight: Bool = false) -> UIButton {
+         let font = UIFont.systemFont(ofSize: 17)
+         let button = UIButton(frame: CGRect(center: .zero,
+                                             size: CGSize(width: title.width(withFont: font) + 20, height: 44)))
+         if highlight {
+             button.setTitleColor(QCropper.Config.highlightColor, for: .normal)
+             button.setTitleColor(QCropper.Config.highlightColor.withAlphaComponent(0.7), for: .highlighted)
+         } else {
+             button.setTitleColor(UIColor(white: 1, alpha: 1.0), for: .normal)
+             button.setTitleColor(UIColor(white: 1, alpha: 0.7), for: .highlighted)
+         }
+         button.titleLabel?.font = font
+         button.setTitle(title, for: .normal)
+         button.top = 0
+
+         button.autoresizingMask = [.flexibleRightMargin, .flexibleWidth]
+         return button
+     }
+
+    
     func updateButtons() {
         if let toolbar = self.toolbar as? Toolbar {
-            toolbar.resetButton.isHidden = isCurrentlyInDefalutState
+            self.resetButton.isHidden = isCurrentlyInDefalutState
             if initialState != nil {
                 toolbar.doneBtn.isEnabled = !isCurrentlyInInitialState
             } else {
@@ -785,6 +827,8 @@ extension CropperViewController: UIScrollViewDelegate {
         overlay.gridLinesAlpha = 1
         topBar.isUserInteractionEnabled = false
         bottomView.isUserInteractionEnabled = false
+        self.resetButton.isHidden = true
+
     }
 
     public func scrollViewDidEndZooming(_: UIScrollView, with _: UIView?, atScale _: CGFloat) {
@@ -810,6 +854,7 @@ extension CropperViewController: UIScrollViewDelegate {
         overlay.gridLinesAlpha = 1
         topBar.isUserInteractionEnabled = false
         bottomView.isUserInteractionEnabled = false
+        resetButton.isHidden = true
     }
 
     public func scrollViewDidEndDragging(_: UIScrollView, willDecelerate decelerate: Bool) {
