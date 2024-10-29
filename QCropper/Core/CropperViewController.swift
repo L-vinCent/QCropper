@@ -169,6 +169,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     lazy var backgroundView: UIView = {
         let view = UIView(frame: self.view.bounds)
         view.backgroundColor = UIColor(white: 0.06, alpha: 1)
+        view.alpha = 0.0
         return view
     }()
 
@@ -176,6 +177,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         let view = UIView(frame: CGRect(x: 0, y: self.view.height - 100, width: self.view.width, height: 100))
         view.autoresizingMask = [.flexibleTopMargin, .flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth]
         view.backgroundColor = .black
+        view.alpha = 0.0
         return view
     }()
 
@@ -363,8 +365,8 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
         if let presentAnimateFrame = presentAnimateFrame,
            let presentAnimateImage = presentAnimateImage,
            let animateImageView = animateImageView {
-           self.backgroundView.alpha = 0.0
-           self.bottomView.alpha = 0.0
+//           self.backgroundView.alpha = 0.0
+//           self.bottomView.alpha = 0.0
 
 //            self.shadowView.isHiddenBlurView = true
             UIView.animate(withDuration: 0.25, animations: {[weak self] in
