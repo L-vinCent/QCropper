@@ -66,6 +66,7 @@ extension AspectRatioSettable where Self: CropperViewController {
 
         topBar.isUserInteractionEnabled = false
         bottomView.isUserInteractionEnabled = false
+        resetButton.isHidden = true
         aspectRatioLocked = true
         currentAspectRatioValue = aspectRatioValue
 

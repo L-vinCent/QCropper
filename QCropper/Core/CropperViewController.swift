@@ -104,7 +104,7 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
     
     public var animateImageView: UIImageView?
     
-    private lazy var resetButton: UIButton = {
+    lazy var resetButton: UIButton = {
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: 44, height: 23))
         button.setTitle("还原", for: .normal)
         button.setTitleColor(.qc.rgba(212, 212, 212), for: .normal)
@@ -675,6 +675,10 @@ open class CropperViewController: UIViewController, Rotatable, StateRestorable, 
                 toolbar.doneBtn.isEnabled = true//!isCurrentlyInDefalutState
             }
         }
+        
+        let cropBoxBottomY = overlay.cropBoxFrame.maxY
+        resetButton.bottom = cropBoxBottomY - 20
+        
     }
 
     func scrollViewZoomScaleToBounds() -> CGFloat {

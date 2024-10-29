@@ -52,6 +52,7 @@ extension Rotatable where Self: CropperViewController {
     public func rotate90degrees(clockwise: Bool = true) {
         topBar.isUserInteractionEnabled = false
         bottomView.isUserInteractionEnabled = false
+        resetButton.isHidden = true
 
         guard let animationContainer = scrollView.superview else { return }
 
